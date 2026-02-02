@@ -31,8 +31,10 @@ void exibirInOrdem(Raiz raiz);
 void exibirPreOrdem(Raiz raiz);
 void exibirPosOrdem(Raiz raiz);
 void exibirLista(no *lista);
-void recriarArvore(no *listaInOrdem, no *listaPreOrdem);
+Raiz recriarArvore(no *listaInOrdem, no *listaPreOrdem);
+void excluirValor(no **lista, int valor);
 int maior(Raiz raiz);
 int menor(Raiz raiz);
+int tamanhoLista(no *lista);
 
 #endif
