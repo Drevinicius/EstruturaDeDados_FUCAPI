@@ -107,4 +107,6 @@ void recriarArvore(no *listaInOrdem, no *listaPreOrdem){
     Raiz raiz = NULL;
     inserirNo(&raiz, listaPreOrdem->valor);
     
+    printf("Teste");
+
 }
