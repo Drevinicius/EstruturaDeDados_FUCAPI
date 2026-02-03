@@ -132,14 +132,14 @@ int menor(Raiz raiz){
 }
 
 /* Copia os valores da lista para o vetor (vetor já alocado com tamanho n). */
-static void listaParaVetor(no *lista, int *vet, int n){
+void listaParaVetor(no *lista, int *vet, int n){
     for(int i = 0; i < n && lista != NULL; i++, lista = lista->prx){
         vet[i] = lista->valor;
     }
 }
 
 /* Constrói a árvore a partir dos segmentos de PreOrdem e InOrdem (por índices). */
-static Raiz construirDePreIn(int *pre, int *in, int preInicio, int preFim, int inInicio, int inFim){
+Raiz construirDePreIn(int *pre, int *in, int preInicio, int preFim, int inInicio, int inFim){
     /* pre: vetor PreOrdem; in: vetor InOrdem; preInicio/preFim: intervalo em pre[]; inInicio/inFim: intervalo em in[] */
     /* se o intervalo está vazio, não há subárvore */
     if(preInicio > preFim || inInicio > inFim){
