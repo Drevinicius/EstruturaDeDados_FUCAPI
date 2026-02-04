@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+
 #define CAPACIDADE_INICIAL 10
 #define FATOR_CRESCIMENTO 2
 
@@ -12,17 +13,15 @@ typedef struct {
     int tamanho;     // Número atual de elementos
 } MaxHeap;
 
-// Funções auxiliares
 int pai(int i) { return (i - 1) / 2; }
 int filhoEsquerdo(int i) { return (2 * i) + 1; }
 int filhoDireito(int i) { return (2 * i) + 2; }
 bool estaVazia(MaxHeap *heap) { return heap->tamanho == 0; }
 
-// Protótipos das funções
 MaxHeap* criarHeap();
 void destruirHeap(MaxHeap *heap);
-void ajustarParaCima(MaxHeap *heap, int i);
-void ajustarParaBaixo(MaxHeap *heap, int i);
+//void ajustarParaCima(MaxHeap *heap, int i);
+//void ajustarParaBaixo(MaxHeap *heap, int i);
 void redimensionarHeap(MaxHeap *heap);
 void inserir(MaxHeap *heap, int valor);
 int extrairMaximo(MaxHeap *heap);
@@ -34,27 +33,31 @@ void imprimirHeap(MaxHeap *heap);
 // 1. Criação do Heap
 MaxHeap* criarHeap() {
     MaxHeap *heap = (MaxHeap*)malloc(sizeof(MaxHeap));
-    if (!heap) {
-        printf("Erro ao alocar memória para o heap\n");
+    if (!heap) { // Se for vazia
+        // Erro ao alocar memória para o heap
         return NULL;
     }
     
+    // Faço com que o array da minha arvore receba uma capacidade maxima
     heap->arr = (int*)malloc(CAPACIDADE_INICIAL * sizeof(int));
     if (!heap->arr) {
-        free(heap);
-        printf("Erro ao alocar memória para o array\n");
+        free(heap); // Libera a arvore heap e retorna NULL
+        // Erro ao alocar memória para o array
         return NULL;
     }
     
+    // Se nao termina de configurar o resto da minha arvore
+    // com capacidade e o tamanho atual 0
     heap->capacidade = CAPACIDADE_INICIAL;
     heap->tamanho = 0;
-    return heap;
+    return heap; // Retorna minha locaçao de memoria
 }
 
 // 2. Destruir Heap (liberar memória)
 void destruirHeap(MaxHeap *heap) {
-    if (heap) {
-        if (heap->arr) {
+    // faço apenas se meu heap tiver elementos
+    if (heap){
+        if (heap->arr){ // Se o array nao for vazio eu libero a memoria dele 
             free(heap->arr);
         }
         free(heap);
@@ -74,28 +77,18 @@ void ajustarParaCima(MaxHeap *heap, int i) {
     }
 }
 
-// 4. Ajustar para baixo (usado na remoção)
-void ajustarParaBaixo(MaxHeap *heap, int i) {
-    int maior = i;
-    int esquerdo = filhoEsquerdo(i);
-    int direito = filhoDireito(i);
-    
-    // Encontra o maior entre pai e filhos
-    if (esquerdo < heap->tamanho && heap->arr[esquerdo] > heap->arr[maior]) {
-        maior = esquerdo;
-    }
-    
-    if (direito < heap->tamanho && heap->arr[direito] > heap->arr[maior]) {
-        maior = direito;
-    }
-    
-    // Se o maior não for o pai, troca e continua ajustando
-    if (maior != i) {
-        int temp = heap->arr[i];
-        heap->arr[i] = heap->arr[maior];
-        heap->arr[maior] = temp;
-        
-        ajustarParaBaixo(heap, maior);
+void downHeap(MaxHeap *arvoreHeap, int index){
+    int idxEsquerda = filhoEsquerdo(index);
+    int idxDireita = filhoDireito(index);
+}
+
+void upHeap(MaxHeap *arvoreHeap, int index){
+    int indexPai = pai(index);
+    if(arvoreHeap->arr[index] < arvoreHeap->arr[indexPai]){
+        int temp = arvoreHeap->arr[index];
+        arvoreHeap->arr[index] = arvoreHeap->arr[indexPai];
+        arvoreHeap->arr[indexPai] = temp;
+        upHeap(arvoreHeap, indexPai); 
     }
 }
 
@@ -105,7 +98,7 @@ void redimensionarHeap(MaxHeap *heap) {
     int *novoArr = (int*)realloc(heap->arr, novaCapacidade * sizeof(int));
     
     if (!novoArr) {
-        printf("Erro ao redimensionar o heap\n");
+        //Erro ao redimensionar o heap
         return;
     }
     
@@ -117,6 +110,7 @@ void redimensionarHeap(MaxHeap *heap) {
 // 6. INSERÇÃO de elemento
 void inserir(MaxHeap *heap, int valor) {
     if (heap->tamanho == heap->capacidade) {
+        // Caso eu ja tenha atingido a capacidade maxima da minha arvore
         redimensionarHeap(heap);
     }
     
@@ -125,15 +119,31 @@ void inserir(MaxHeap *heap, int valor) {
     heap->tamanho++;
     
     // Ajusta a propriedade do heap
-    ajustarParaCima(heap, heap->tamanho - 1);
+    downHeap(heap, heap->tamanho - 1);
     
-    printf("Elemento %d inserido com sucesso\n", valor);
+    // O elemento sera inserido
+}
+
+void inserirRaizMenor(MaxHeap *heap, int valor) {
+    if (heap->tamanho == heap->capacidade) {
+        // Caso eu ja tenha atingido a capacidade maxima da minha arvore
+        redimensionarHeap(heap);
+    }
+    
+    // Adiciona no final
+    heap->arr[heap->tamanho] = valor;
+    heap->tamanho++;
+    
+    // Ajusta a propriedade do heap
+    upHeap(heap, heap->tamanho - 1);
+    
+    // O elemento sera inserido
 }
 
 // 7. REMOÇÃO do máximo (extrair raiz)
 int extrairMaximo(MaxHeap *heap) {
     if (estaVazia(heap)) {
-        printf("Heap vazio! Não é possível extrair máximo\n");
+        //Heap vazio! Não é possível extrair máximo
         return -1;
     }
     
@@ -150,7 +160,7 @@ int extrairMaximo(MaxHeap *heap) {
     heap->tamanho--;
     
     // Ajusta a propriedade do heap
-    ajustarParaBaixo(heap, 0);
+    downHeap(heap, 0);
     
     return raiz;
 }
@@ -188,7 +198,7 @@ void construirHeap(MaxHeap *heap, int arr[], int n) {
     // Aloca novo array
     heap->arr = (int*)malloc(n * sizeof(int));
     if (!heap->arr) {
-        printf("Erro ao alocar memória\n");
+        // Erro ao alocar memória
         return;
     }
     
@@ -202,7 +212,7 @@ void construirHeap(MaxHeap *heap, int arr[], int n) {
     
     // Aplica heapify a partir do último nó não-folha
     for (int i = (n / 2) - 1; i >= 0; i--) {
-        ajustarParaBaixo(heap, i);
+        downHeap(heap, i);
     }
     
     printf("Heap construído a partir de array com %d elementos\n", n);
@@ -215,7 +225,7 @@ void imprimirHeap(MaxHeap *heap) {
         return;
     }
     
-    printf("Heap (tamanho: %d, capacidade: %d):\n", heap->tamanho, heap->capacidade);
+    //printf("Heap (tamanho: %d, capacidade: %d):\n", heap->tamanho, heap->capacidade);
     
     // Imprime como array
     printf("Array: [");
@@ -245,64 +255,96 @@ void imprimirHeap(MaxHeap *heap) {
     if (contador > 0) printf("\n");
 }
 
-// 12. Função principal para demonstrar o uso
-int main() {
-    printf("=== DEMONSTRAÇÃO ===\n\n");
+/*Criar uma funcao que receba 2 arvores HEAP e um elemento
+ *A funçao deve unir a 2 arvores numa nova e re-odenar seus elementos
+ *de modo correto
+ 
+ 3 - 8 - 5
+ 2 - 4 - 6
+ */
+
+ void inserirParaRecriar(MaxHeap *novoHeap, MaxHeap *pr, MaxHeap *sc, int indexPai){
+
+    if(indexPai >= pr->tamanho && indexPai >= sc->tamanho){
+        return;
+    }if(novoHeap->capacidade == novoHeap->tamanho){
+        redimensionarHeap(novoHeap);
+    }
+
+    if(novoHeap->tamanho == 1){
+        if(pr->tamanho > 0) {
+            novoHeap->arr[novoHeap->tamanho] = pr->arr[0];
+            novoHeap->tamanho++;
+        }if(sc->tamanho > 0) {
+            if(novoHeap->capacidade == novoHeap->tamanho){
+                redimensionarHeap(novoHeap);
+            }
+            novoHeap->arr[novoHeap->tamanho] = sc->arr[0];
+            novoHeap->tamanho++;
+        }
+    }
     
+    int idxEsq = filhoEsquerdo(indexPai);
+    int idxDir = filhoDireito(indexPai);
+    
+
+    if(idxEsq < pr->tamanho){
+        if(novoHeap->capacidade == novoHeap->tamanho){
+            redimensionarHeap(novoHeap);
+        }
+        novoHeap->arr[novoHeap->tamanho] = pr->arr[idxEsq];
+        novoHeap->tamanho++;
+    }if(idxDir < pr->tamanho){
+        if(novoHeap->capacidade == novoHeap->tamanho){
+            redimensionarHeap(novoHeap);
+        }
+        novoHeap->arr[novoHeap->tamanho] = pr->arr[idxDir];
+        novoHeap->tamanho++;
+    }if(idxEsq < sc->tamanho){
+        if(novoHeap->capacidade == novoHeap->tamanho){
+            redimensionarHeap(novoHeap);
+        }
+        novoHeap->arr[novoHeap->tamanho] = sc->arr[idxEsq];
+        novoHeap->tamanho++;
+    }if(idxDir < sc->tamanho){
+        if(novoHeap->capacidade == novoHeap->tamanho){
+            redimensionarHeap(novoHeap);
+        }
+        novoHeap->arr[novoHeap->tamanho] = sc->arr[idxDir];
+        novoHeap->tamanho++;
+    }
+
+    inserirParaRecriar(novoHeap, pr, sc, indexPai + 1);
+}
+
+ MaxHeap *recriarHeap(MaxHeap *primeiraArvore, MaxHeap *segundaArvore, int novoElemento){
+    MaxHeap *heapAgrupado = criarHeap();
+    heapAgrupado->arr[0] = novoElemento;
+    heapAgrupado->tamanho++;
+    inserirParaRecriar(heapAgrupado,primeiraArvore, segundaArvore, 0);
+    
+    downHeap(heapAgrupado, 0);
+    
+    return heapAgrupado;
+ }
+
+int main() {    
     // Cria heap
-    MaxHeap *heap = criarHeap();
-    
-    // 1. Teste de inserção
-    printf("1. INSERINDO ELEMENTOS:\n");
-    inserir(heap, 10);
-    inserir(heap, 20);
-    inserir(heap, 15);
-    inserir(heap, 30);
-    inserir(heap, 40);
-    inserir(heap, 5);
-    inserir(heap, 50);
-    imprimirHeap(heap);
-    printf("\n");
-    
-    // 2. Teste de remoção do máximo
-    printf("2. REMOVENDO MÁXIMOS:\n");
-    int max = extrairMaximo(heap);
-    printf("Máximo extraído: %d\n", max);
-    imprimirHeap(heap);
-    
-    max = extrairMaximo(heap);
-    printf("Máximo extraído: %d\n", max);
-    imprimirHeap(heap);
-    printf("\n");
-    
-    // 3. Teste de remoção de elemento específico
-    printf("3. REMOVENDO ELEMENTO ESPECÍFICO:\n");
-    printf("Antes da remoção:\n");
-    inserir(heap, 25);
-    inserir(heap, 35);
-    imprimirHeap(heap);
-    
-    // Remove o elemento na posição 2 (terceiro elemento)
-    removerElemento(heap, 2);
-    printf("Após remoção:\n");
-    imprimirHeap(heap);
-    printf("\n");
-    
-    // 4. Teste de delete completo
-    printf("4. DELETE COMPLETO DO HEAP:\n");
-    deletarHeap(heap);
-    imprimirHeap(heap);
-    printf("\n");
-    
-    // 5. Teste de construção a partir de array
-    printf("5. CONSTRUÇÃO A PARTIR DE ARRAY:\n");
-    int arr[] = {4, 10, 3, 5, 1, 8, 7, 2, 9, 6};
-    int n = sizeof(arr) / sizeof(arr[0]);
-    construirHeap(heap, arr, n);
-    imprimirHeap(heap);
-    
-    // Limpeza
-    destruirHeap(heap);
-    
+    MaxHeap *primeiraArvoreHeap = criarHeap();
+    MaxHeap *segundaArvoreHeap = criarHeap();
+
+    inserirRaizMenor(primeiraArvoreHeap, 3);
+    inserirRaizMenor(primeiraArvoreHeap, 5);
+    inserirRaizMenor(primeiraArvoreHeap, 8);
+
+    inserirRaizMenor(segundaArvoreHeap, 2);
+    inserirRaizMenor(segundaArvoreHeap, 4);
+    inserirRaizMenor(segundaArvoreHeap, 6);
+
+    MaxHeap *novaArvore = recriarHeap(primeiraArvoreHeap, segundaArvoreHeap, 7);
+    imprimirHeap(novaArvore);
+
+    destruirHeap(primeiraArvoreHeap);
+    destruirHeap(segundaArvoreHeap);
     return 0;
 }
