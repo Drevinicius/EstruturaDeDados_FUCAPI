@@ -80,6 +80,14 @@ void ajustarParaCima(MaxHeap *heap, int i) {
 void downHeap(MaxHeap *arvoreHeap, int index){
     int idxEsquerda = filhoEsquerdo(index);
     int idxDireita = filhoDireito(index);
+    int idxMenor = arvoreHeap->arr[idxDireita] > arvoreHeap->arr[idxEsquerda] ? idxEsquerda:idxDireita;
+    if(arvoreHeap->arr[index] > arvoreHeap->arr[idxMenor]){
+        int temp = arvoreHeap->arr[index];
+        arvoreHeap->arr[index] = arvoreHeap->arr[idxMenor];
+        arvoreHeap->arr[idxMenor] = temp;
+        downHeap(arvoreHeap, idxMenor);
+    }
+    return;
 }
 
 void upHeap(MaxHeap *arvoreHeap, int index){
