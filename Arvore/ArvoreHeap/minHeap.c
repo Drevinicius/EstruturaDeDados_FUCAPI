@@ -1,6 +1,6 @@
 #include "minHeap.h"
 
-// Funcoes auxiliares para calcular folhas
+// Funcoes auxiliares para calcular folhas e pai
 int pai(int i) { return (i - 1) / 2; }
 int filhoEsquerdo(int i) { return (2 * i) + 1; }
 int filhoDireito(int i) { return (2 * i) + 2; }
@@ -58,6 +58,7 @@ void upHeap(MinHeap *arvoreHeap, int index){
     }
 }
 
+// Aumento a locacao do meu vetor caso eu atinja a capacidade e dobro a capacidade
 void redimensionarHeap(MinHeap *heap) {
     int novaCapacidade = heap->capacidade * FATOR_CRESCIMENTO;
     int *novoArr = (int*)realloc(heap->arr, novaCapacidade * sizeof(int));
@@ -70,7 +71,7 @@ void redimensionarHeap(MinHeap *heap) {
     heap->capacidade = novaCapacidade;
 }
 
-// Metodo de insercao e ajuste
+// Metodo de insercao e ajuste como upHeap
 void inserirMinHeap(MinHeap *heap, int valor) {
     if (heap->tamanho == heap->capacidade) {
         redimensionarHeap(heap);
@@ -82,12 +83,13 @@ void inserirMinHeap(MinHeap *heap, int valor) {
     upHeap(heap, heap->tamanho - 1);
 }
 
+// Funcao que recebe a arvore e imprime como array e formato de arvore
 void imprimirHeap(MinHeap *heap) {
     if (estaVazia(heap)) {
         printf("Heap vazio\n");
         return;
     }
-
+    // Primeiro imprimo meu array
     printf("Array: [");
     for (int i = 0; i < heap->tamanho; i++) {
         printf("%d", heap->arr[i]);
@@ -95,7 +97,7 @@ void imprimirHeap(MinHeap *heap) {
     }
     printf("]\n");
     
-    // Imprime como árvore (níveis)
+    // Segundo imprimo como árvore por níveis
     printf("Estrutura de árvore:\n");
     int nivel = 0;
     int elementosNoNivel = 1;
@@ -116,11 +118,15 @@ void imprimirHeap(MinHeap *heap) {
 }
 
 // Funcao que pega 2 arvores heap e uni a uma terceira de forma sequencial
-void unirArvoresHeap(MinHeap *novoHeap, MinHeap *primeiroHeap, MinHeap *secundoHeap, int indexPai){
+void unirArvoresHeap(MinHeap *novoHeap, MinHeap *primeiroHeap, MinHeap *secundoHeap, int novoElemento, int indexPai, bool verOriginal){
     if(indexPai >= primeiroHeap->tamanho && indexPai >= secundoHeap->tamanho){
         return;
     }if(novoHeap->capacidade == novoHeap->tamanho){
         redimensionarHeap(novoHeap);
+    }
+    if(novoHeap->tamanho == 0){
+        novoHeap->arr[0] = novoElemento;
+        novoHeap->tamanho++; 
     }
     if(novoHeap->tamanho == 1){
         if(primeiroHeap->tamanho > 0) {
@@ -163,19 +169,15 @@ void unirArvoresHeap(MinHeap *novoHeap, MinHeap *primeiroHeap, MinHeap *secundoH
         novoHeap->arr[novoHeap->tamanho] = secundoHeap->arr[idxDir];
         novoHeap->tamanho++;
     }
-    unirArvoresHeap(novoHeap, primeiroHeap, secundoHeap, indexPai + 1);
+    if(primeiroHeap->tamanho + secundoHeap->tamanho+1 == novoHeap->tamanho){
+        if(verOriginal){
+            //verOriginal = false;
+            printf("Exibindo array original: \n");
+            imprimirHeap(novoHeap);
+        }
+        downHeap(novoHeap, 0);
+        return;
+    }
+    unirArvoresHeap(novoHeap, primeiroHeap, secundoHeap, novoElemento, indexPai + 1, verOriginal);
 }
 
- MinHeap *recriarHeap(MinHeap *primeiraArvore, MinHeap *segundaArvore, int novoElemento){
-    MinHeap *heapAgrupado = criarHeap();
-    heapAgrupado->arr[0] = novoElemento;
-    heapAgrupado->tamanho++;
-    unirArvoresHeap(heapAgrupado,primeiraArvore, segundaArvore, 0);
-    
-    printf("Exibindo arvore antes do sort: \n");
-    imprimirHeap(heapAgrupado);
-
-    downHeap(heapAgrupado, 0);
-    
-    return heapAgrupado;
- }

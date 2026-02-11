@@ -13,11 +13,15 @@ int main() {
     inserirMinHeap(segundaArvoreHeap, 4);
     inserirMinHeap(segundaArvoreHeap, 6);
 
-    MinHeap *novaArvore = recriarHeap(primeiraArvoreHeap, segundaArvoreHeap, 7);
+    MinHeap *novaArvore = criarHeap();
+    unirArvoresHeap(novaArvore, primeiraArvoreHeap, segundaArvoreHeap, 7, 0, true);
+
     printf("Exibindo arvore pos sort: \n");
     imprimirHeap(novaArvore);
 
-    destruirHeap(primeiraArvoreHeap);
-    destruirHeap(segundaArvoreHeap);
+    //destruirHeap(primeiraArvoreHeap);
+    //destruirHeap(segundaArvoreHeap);
+    free(primeiraArvoreHeap);
+    free(segundaArvoreHeap);
     return 0;
 }

@@ -17,10 +17,10 @@ typedef struct {
 
 // Funcoes principais
 MinHeap* criarHeap();
-void destruirHeap(MinHeap *heap);
+//void destruirHeap(MinHeap *heap);
 void redimensionarHeap(MinHeap *heap);
 void inserirMinHeap(MinHeap *heap, int valor);
 void imprimirHeap(MinHeap *heap);
-MinHeap *recriarHeap(MinHeap *primeiraArvore, MinHeap *segundaArvore, int novoElemento);
+void unirArvoresHeap(MinHeap *novoHeap, MinHeap *primeiroHeap, MinHeap *secundoHeap, int novoElemento, int indexPai, bool verOriginal);
 
 #endif
